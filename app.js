@@ -29,11 +29,12 @@ buttonEl.onclick = function(e) {
     const type = selectEl.value;
     posts.push({
         text,
-        type
+        type,
+        likes: 0,
     });
     textEl.value = '';
     selectEl.value = 'Обычный';
-    console.log(posts);
+    rebuildPosts(postsEl, posts);
 }
 
 rootEl.appendChild(formEl);
@@ -41,10 +42,71 @@ rootEl.appendChild(formEl);
 const postsEl = document.createElement('div');
 rootEl.appendChild(postsEl);
 
-function rebuildPosts(containerEl, items) {
+function rebuildPosts(containerEl, iterateItems) {
     for (const item of [...containerEl.children]) {
         containerEl.removeChild(item)
     }
 
+    for (const item of iterateItems) {
+        const newPostEl = document.createElement('div');
+        newPostEl.className = 'card mt-3';
+        
+        if (item.type === 'Обычный') {
+           newPostEl.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">${item.text}</p>
+                        <button data-action="like" class="btn btn-primary mr-2">❤ ${item.likes}</button>
+                        <button data-action="dislike" class="btn btn-primary">👎</button>
+                    </div>
+                </div>
+           `; 
+        } else if (item.type === 'Картинка') {
+            newPostEl.innerHTML = `
+                <div class="card">
+                    <img src="${item.text}" class="card-img-top">
+                    <div class="card-body">
+                        <button data-action="like" class="btn btn-primary mr-2">❤ ${item.likes}</button>
+                        <button data-action="dislike" class="btn btn-primary">👎</button>
+                    </div>
+                </div>
+           `;
+        } else if (item.type === 'Видео') {
+            newPostEl.innerHTML = `
+                <div class="card">
+                    <div class="card-img-top embed-responsive embed-responsive-16by9">
+                        <video src="${item.text}" controls=""></video>
+                    </div>
+                    <div class="card-body">
+                        <button data-action="like" class="btn btn-primary mr-2">❤ ${item.likes}</button>
+                        <button data-action="dislike" class="btn btn-primary">👎</button>
+                    </div>
+                </div>
+           `;
+        } else if (item.type === 'Аудио') {
+            newPostEl.innerHTML = `
+                <div class="card">
+                    <audio controls="" class="card-img-top" src="${item.text}"></audio>
+                    <div class="card-body">
+                        <button data-action="like" class="btn btn-primary mr-2">❤ ${item.likes}</button>
+                        <button data-action="dislike" class="btn btn-primary">👎</button>
+                    </div>
+                </div>
+           `;
+        }
 
+        const likeButtonEl = newPostEl.querySelector('[data-action=like]');
+        likeButtonEl.onclick = function() {
+            item.likes++;
+            rebuildPosts(containerEl, iterateItems);
+        }
+
+        const dislikeButtonEl = newPostEl.querySelector('[data-action=dislike]');
+        dislikeButtonEl.onclick = function() {
+            item.likes--;
+            rebuildPosts(containerEl, iterateItems);
+        }
+        
+        containerEl.appendChild(newPostEl);
+    }
 }
