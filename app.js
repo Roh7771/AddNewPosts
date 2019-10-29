@@ -20,22 +20,23 @@ formEl.innerHTML = `
     <button class="btn btn-primary" data-type="button">Добавить</button>
 `;
 
+const textEl = formEl.querySelector('[data-type=text]');
+const selectEl = formEl.querySelector('[data-type=select]');
+textEl.value = '';
+selectEl.value = 'Обычный';
+
 buttonEl = formEl.querySelector('[data-type=button]');
-buttonEl.onclick = function(e) {
+buttonEl.addEventListener('click', function (e) {
     e.preventDefault();
-    const textEl = formEl.querySelector('[data-type=text]');
     const text = textEl.value;
-    const selectEl = formEl.querySelector('[data-type=select]');
     const type = selectEl.value;
     posts.push({
         text,
         type,
         likes: 0,
     });
-    textEl.value = '';
-    selectEl.value = 'Обычный';
     rebuildPosts(postsEl, posts);
-}
+})
 
 rootEl.appendChild(formEl);
 
@@ -50,9 +51,9 @@ function rebuildPosts(containerEl, iterateItems) {
     for (const item of iterateItems) {
         const newPostEl = document.createElement('div');
         newPostEl.className = 'card mt-3';
-        
+
         if (item.type === 'Обычный') {
-           newPostEl.innerHTML = `
+            newPostEl.innerHTML = `
                 <div class="card">
                     <div class="card-body">
                         <p class="card-text">${item.text}</p>
@@ -60,7 +61,7 @@ function rebuildPosts(containerEl, iterateItems) {
                         <button data-action="dislike" class="btn btn-primary">👎</button>
                     </div>
                 </div>
-           `; 
+           `;
         } else if (item.type === 'Картинка') {
             newPostEl.innerHTML = `
                 <div class="card">
@@ -96,17 +97,17 @@ function rebuildPosts(containerEl, iterateItems) {
         }
 
         const likeButtonEl = newPostEl.querySelector('[data-action=like]');
-        likeButtonEl.onclick = function() {
+        likeButtonEl.addEventListener('click', function () {
             item.likes++;
             rebuildPosts(containerEl, iterateItems);
-        }
+        })
 
         const dislikeButtonEl = newPostEl.querySelector('[data-action=dislike]');
-        dislikeButtonEl.onclick = function() {
+        dislikeButtonEl.addEventListener('click', function () {
             item.likes--;
             rebuildPosts(containerEl, iterateItems);
-        }
-        
+        })
+
         containerEl.appendChild(newPostEl);
     }
 }
